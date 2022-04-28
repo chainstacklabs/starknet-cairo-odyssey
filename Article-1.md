@@ -2,7 +2,7 @@
 
 During the past few months, I've been reading articles, tweets and I even meet some of the StarkWare team members. The enthusiasm behind this project is huge so I decided to do some research, and try to create an app that runs on the StarkNet testnet.
 
-However, before any of that, I knew that if I wanted to understand why layer two solutions are so popular, first I needed to know the problem they solve and how they do it. That's where the StarkNet Odyssey started.
+However, before any of that, I knew that if I wanted to understand why layer two solutions are so popular, first I needed to know the problem they solve and how they do it. That's where the StarkNet Odyssey started for me 🚀🪐
 
 ## The Ethereum scalability problem
 
@@ -125,23 +125,8 @@ To deploy to the StarkNet mainnet, use `nile deploy my_contract --alias my_contr
 
 If you have any issues, you can double check these steps in [the official guide](https://www.cairo-lang.org/docs/quickstart.html).
 
-### Front end and dApps
+## Conclusion
 
-There is a starknet.js library for the frontend that injects a starknet object similar to `window.ethereum`. In addition, the or "get-starknet" `npm i get-starknet`
+In this first part of this series, we've reviewed what L2 solutions are and what problems they solve. We've also analysed what are zero knowledge proofs and how StarkNet uses them to validate transactions.
 
-```js
-import {getStartknet} from "@argent/get-starknet"
-
-const starknet = getStarknet({showModal: true})
-
-const [userAccountAddress] = await starknet.enable({showModal: true})
-
-if(starknet.isConnected){
-  //if connected, we can interact with contracts and sign transactions
-  starknet.signer.invokeFunction({...})
-}else{
-  // we can still use the provider to query the blockchain
-  starknet.provider.callContract(...)
-}
-
-```
+Now with the development environment setup, and that we know all the different tools that we need, we're ready to create an app and deploy it to StarkNet test net. But that will be in part 2 of this StarkNet odyssey 🚀🪐
