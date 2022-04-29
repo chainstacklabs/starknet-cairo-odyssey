@@ -104,6 +104,10 @@ Now install depenencies required for Cairo with `pip3 install ecdsa fastecdsa sy
 
 Next, install the Cairo language itself with `pip3 install cairo-lang`
 
+If you have any issues, you can double check these steps in [the official guide](https://www.cairo-lang.org/docs/quickstart.html).
+
+### First steps with Nile
+
 Nile is the toolbox that facilitates bootstraping a Cairo project. To install it, run `pip install cairo-nile`. To initialise a project, just run `nile init`
 
 ![](./img/cairo-init.png)
@@ -122,8 +126,6 @@ Here are the main commands you can run with Nile:
 ![](./img/nile-call-invoke.png)
 
 To deploy to the StarkNet mainnet, use `nile deploy my_contract --alias my_contract --network mainnet`
-
-If you have any issues, you can double check these steps in [the official guide](https://www.cairo-lang.org/docs/quickstart.html).
 
 ## Conclusion
 
