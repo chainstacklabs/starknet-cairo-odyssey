@@ -1,0 +1,25 @@
+[
+    {
+        "inputs": [
+            {
+                "name": "new_message",
+                "type": "felt"
+            }
+        ],
+        "name": "update_message",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "read_message",
+        "outputs": [
+            {
+                "name": "res",
+                "type": "felt"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
+]
