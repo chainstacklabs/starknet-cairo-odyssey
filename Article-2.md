@@ -8,7 +8,42 @@ Cairo is... well, Cairo is hell. The learning curve is super steep but every ste
 
 CAIRO IS HELL IMAGE
 
-## Cairo FAQs
+## Cairo must known
+
+### Contract structure
+
+Contracts in Cairo have a similar structure to contracts writen in Solidity.
+
+```php
+# Declare this file as a StarkNet contract.
+%lang starknet
+
+# Imports
+from starkware.cairo.common.cairo_builtins import HashBuiltin
+
+# State variables, structs, etc
+
+# Account struct
+struct Account:
+    member isOpen: felt
+    member balance: felt
+end
+
+# Keeps a counter of the number of accounts
+@storage_var
+func number_of_accounts() -> (res: felt):
+end
+
+# Contract methods
+
+# view function that returns the number of accounts from the storage variable
+@view
+func accountsOpen{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (res: felt):
+    let (res) = number_of_accounts.read()
+    return (res)
+end
+
+```
 
 ### WTF is felt?
 
@@ -24,7 +59,7 @@ CAIRO IS HELL IMAGE
 
 ### Storage variables: read and write
 
-Contract state variables are called storage variables in Cairo. To define them, we need to use the `@storage_var` decorator:
+Contract state variables are called storage variables in Cairo. To define them, we need to use the `@storage_var` decorator and declare them as functions as follows:
 
 ```php
 # Keeps a counter of the number of accounts
@@ -57,6 +92,57 @@ end
 
 ```
 
+### Declaring variables
+
+Variables can be aliased, using the `let` keyword, or evaluated, using the `const`, `local` or `tempvar` keywords.
+
+- `const` used for constants, can not be re-assigned.
+- `local` used for local variables. Can not be re-assigned and require adding `allow_locals` to the function
+- `tempvar` used for temporary variables. They can be re-assigned.
+- `let` used to create alias by value or by reference to another variables. Can be re-assigned.
+
+Here are some examples of how to use them:
+
+```php
+%lang starknet
+
+# persistent state variable
+@storage_var
+func storage_variable() -> (res : felt):
+end
+
+func variable_examples{}():
+  // required to use local variables
+  allow_locals
+
+  // creating alias by value
+  let a = 5
+  let b = 3
+
+  // creating alias by reference. x value is 5
+  let x = a
+
+
+  // constant, can not be re assigned
+  const ten = 10
+
+  // res is 15 here, 5 * 3
+  tempvar res = a * b
+
+  //local varible. c is 15
+  local c = ten + a
+
+  // re-assign aliased variable
+  let b = 2
+
+  // re-assign tempvar. res is 10 here, 5 * 2
+  tempvar res = a * b
+
+end
+```
+
+Notice that in order to re-assign a variable, you have to indicate the variable type (`tempvar`, `let`).
+
 ### Structs and Mappings
 
 Structs are very similar to Solidity, we just have to define them with the `struct` keyword and define all its attributes:
@@ -80,8 +166,7 @@ func accounts_storage(address: felt) -> (account: Account):
 end
 ```
 
-- arrays, how to create one and return it
-- mappings
+### arrays, how to create one and return it
 
 ### Contract functions
 
