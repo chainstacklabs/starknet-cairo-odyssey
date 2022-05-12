@@ -1,0 +1,13 @@
+[
+    {
+        "inputs": [
+            {
+                "name": "guess",
+                "type": "felt"
+            }
+        ],
+        "name": "demo_assert",
+        "outputs": [],
+        "type": "function"
+    }
+]

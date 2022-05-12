@@ -1,0 +1,27 @@
+[
+    {
+        "inputs": [
+            {
+                "name": "test_0",
+                "type": "felt"
+            },
+            {
+                "name": "test_1",
+                "type": "felt"
+            }
+        ],
+        "name": "asserter",
+        "outputs": [
+            {
+                "name": "val_1",
+                "type": "felt"
+            },
+            {
+                "name": "val_2",
+                "type": "felt"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
+]

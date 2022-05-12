@@ -8,88 +8,106 @@ Cairo is... well, Cairo is hell. The learning curve is super steep but every ste
 
 CAIRO IS HELL IMAGE
 
-## Cairo must known
+So let's try to break down the most common paterns and things that you need to know before you start to write a single line of code
 
-### Contract structure
+## Cairo fundamentals
 
-Contracts in Cairo have a similar structure to contracts writen in Solidity.
+### WTF is felt?
+
+`felt` stands for Field Element is the only data type in Cairo. In simple terms, it's an unsigned integer with up to 76 decimals but it can also be used store addresses.
+
+### Strings
+
+**Currently, Cairo does not support strings.** It supports, however, short strings of up to 31 characters but they're actually stored in `felt`.
 
 ```php
-# Declare this file as a StarkNet contract.
-%lang starknet
+#  = 448378203247
+let hello_string = 'hello'
+```
 
-# Imports
+### Arrays
+
+Working with arrays in Cairo is done using a pointer that points to the start of the array, which is declared as a `felt*` using the `alloc` method.
+
+Adding new elements to the array can be done using `assert` ([more on that later](#assert)) and the pointer. See an example below:
+
+```php
+%lang starknet
+%builtins range_check
+
+# import to use alloc
+from starkware.cairo.common.alloc import alloc
+
+# view function that returns a felt and
+# has range_check_ptr as an implicid argument
+@view
+func array_demo{range_check_ptr}(index : felt) -> (value : felt):
+    # Creates a pointer to the start of an array.
+    let (my_array : felt*) = alloc()
+
+    # sets 3 as the value of the first element of the array
+    assert [felt_array] = 3
+    # sets 15 as the value of the second element of the arrat
+    assert [felt_array + 1] = 15
+    # sets index 2 to value 33.
+    assert [felt_array + 2] = 33
+    assert [felt_array + 9] = 18
+    # Access the list at the selected index.
+    let val = felt_array[index]
+    return (val)
+end
+```
+
+If we try to read a value from an array at an invalid index, the program will fail with the following error: **Unknown value for memory cell at address**.
+
+You can use arrays as function parameters or in returns, but when declaring it, you should indicate two parameters, the array's length, and the array itself. The naming convention is also important and should be `my-_array_name` and `my_array_name_len`. For example:
+
+```php
+%lang starknet
+%builtins pedersen range_check
+
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 
-# State variables, structs, etc
+# Function that receives an array as parameter
+@external
+func array_play{syscall_ptr : felt*,range_check_ptr
+    }(array_param_len : felt, array_param : felt*) -> (res: felt):
+    # read first element of the array
+    let first = array_param[0]
+    # read last element of the array
+    let last = array_param[array_param_len - 1]
 
+    let res = first + last
+
+    return (res)
+end
+```
+
+If you don't follow the proper naming convention, you'll get the following error from the compiler: **Array argument "array_param" must be preceded by a length argument named "array_param_len" of type felt.**
+
+You can find an example to work with arrays in Cairo in [this cairo contract](./cairo-app/contracts/arrays.cairo).
+
+### Structs and Mappings
+
+Structs are very similar to Solidity, we just have to define them with the `struct` keyword and define all its attributes as a `member`:
+
+```php
 # Account struct
 struct Account:
     member isOpen: felt
     member balance: felt
 end
 
-# Keeps a counter of the number of accounts
-@storage_var
-func number_of_accounts() -> (res: felt):
-end
-
-# Contract methods
-
-# view function that returns the number of accounts from the storage variable
-@view
-func accountsOpen{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (res: felt):
-    let (res) = number_of_accounts.read()
-    return (res)
-end
-
 ```
 
-### WTF is felt?
-
-`felt` stands for Field Element is the default data type in Cairo. In simple terms, it's used for integers with up to 76 decimals but it's also used store addresses.
-
-### Strings
-
-**Currently, Cairo does not support strings.** It supports, however, short strings of up to 31 characters stored in `felt`.
+Mappings are also very similar. You have to define the types and use the `->` between the key and the value.
 
 ```php
-[message] = 'hello!'
-```
-
-### Storage variables: read and write
-
-Contract state variables are called storage variables in Cairo. To define them, we need to use the `@storage_var` decorator and declare them as functions as follows:
-
-```php
-# Keeps a counter of the number of accounts
+# Mapping named "accounts_storage" that holds the account details for
+# each user using his address as key
 @storage_var
-func number_of_accounts() -> (res: felt):
+func accounts_storage(address: felt) -> (account: Account):
 end
-
-```
-
-In order to read and write to storage variables, we need to use the `read` and `write` methods, making sure that the data type that we pass matches with the data type defined in the storage variable:
-
-```php
-# Keeps a counter of the number of accounts
-@storage_var
-func number_of_accounts() -> (res: felt):
-end
-
-
-# Creates an account for the user
-@external
-func readWriteAccounts{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}():
-
-    // read number of accounts from storage
-    let (n_accs) = number_of_accounts.read()
-
-    // writes number of accounts in storage
-    number_of_accounts.write(n_accs + 1)
-    return ()
-end
-
 ```
 
 ### Declaring variables
@@ -143,30 +161,70 @@ end
 
 Notice that in order to re-assign a variable, you have to indicate the variable type (`tempvar`, `let`).
 
-### Structs and Mappings
+### Storage variables: read and write
 
-Structs are very similar to Solidity, we just have to define them with the `struct` keyword and define all its attributes:
-
-```php
-# Account struct
-struct Account:
-    member isOpen: felt
-    member balance: felt
-end
-
-```
-
-Mappings are also very similar:
+Contract state variables are called storage variables in Cairo. To define them, we need to use the `@storage_var` decorator and declare them as functions as follows:
 
 ```php
-# Mapping named accounts_storage that holds the account details for
-# each user using his address as key
+# Keeps a counter of the number of accounts
 @storage_var
-func accounts_storage(address: felt) -> (account: Account):
+func number_of_accounts() -> (res: felt):
 end
+
 ```
 
-### arrays, how to create one and return it
+In order to read and write to storage variables, we need to use the `read` and `write` methods, making sure that the data type that we pass matches with the data type defined in the storage variable:
+
+```php
+# Keeps a counter of the number of accounts
+@storage_var
+func number_of_accounts() -> (res: felt):
+end
+
+
+# Creates an account for the user
+@external
+func readWriteAccounts{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}():
+
+    // read number of accounts from storage
+    let (n_accs) = number_of_accounts.read()
+
+    // writes number of accounts in storage
+    number_of_accounts.write(n_accs + 1)
+    return ()
+end
+
+```
+
+### Assert statement
+
+Assert is very useful statement that can be used for two completely different things:
+
+- to compare if the value of two variables is the same
+- to set the value in a variable that has not been set before
+
+See the example below:
+
+```php
+%lang starknet
+
+# Function that
+@external
+func demo_assert(guess : felt) :
+    const a = 7
+
+    tempvar b
+    # verifies if the guess is 7
+    assert a = guess
+    # assigns 5 to variable b
+    assert b = 5
+    # verifies if the guess is 5
+    assert b = guess
+
+    return ()
+end
+
+```
 
 ### Contract functions
 
@@ -198,6 +256,43 @@ end
 If you just got another WTF moment when reading `{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}`, let me explain. Those are implicid function arguments. they are used to access the state variables behind the scenes. In addition, `range_check_ptr` can be used to compare integers. Just remember to include them in your function declarations if you want to avoid the following error: **Unknown identifier 'syscall_ptr' ... Unknown identifier 'syscall_ptr'** 😉
 
 ![](./img/nile-compile-implicit-args.png)
+
+Returned values must be indicated in the function declaration, and wraped in parentheisis in the body 😉
+
+### Contract structure
+
+Contracts in Cairo have a similar structure to contracts writen in Solidity.
+
+```php
+# Declare this file as a StarkNet contract.
+%lang starknet
+
+# Imports
+from starkware.cairo.common.cairo_builtins import HashBuiltin
+
+# State variables, structs, etc
+
+# Account struct
+struct Account:
+    member isOpen: felt
+    member balance: felt
+end
+
+# Keeps a counter of the number of accounts
+@storage_var
+func number_of_accounts() -> (res: felt):
+end
+
+# Contract methods
+
+# view function that returns the number of accounts from the storage variable
+@view
+func accountsOpen{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (res: felt):
+    let (res) = number_of_accounts.read()
+    return (res)
+end
+
+```
 
 ### A basic contract with Nile
 

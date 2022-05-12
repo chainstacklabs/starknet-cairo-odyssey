@@ -1,0 +1,39 @@
+[
+    {
+        "inputs": [
+            {
+                "name": "index",
+                "type": "felt"
+            }
+        ],
+        "name": "array_read",
+        "outputs": [
+            {
+                "name": "value",
+                "type": "felt"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "array_param_len",
+                "type": "felt"
+            },
+            {
+                "name": "array_param",
+                "type": "felt*"
+            }
+        ],
+        "name": "array_play",
+        "outputs": [
+            {
+                "name": "res",
+                "type": "felt"
+            }
+        ],
+        "type": "function"
+    }
+]
