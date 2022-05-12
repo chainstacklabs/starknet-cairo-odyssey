@@ -294,7 +294,11 @@ end
 
 ```
 
+### Messaging between L1-L2 ??
+
 ### A basic contract with Nile
+
+That covers some of the basics so, let's check basic example of a contract that allows users to open an account and deposit funds.
 
 ## Front end and dApps
 
