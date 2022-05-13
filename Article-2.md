@@ -100,7 +100,7 @@ end
 
 ```
 
-Mappings are also very similar. You have to define the types and use the `->` between the key and the value.
+To create a **mapping in Cairo** you have to define the types and use the `->` between the key and the value. For example:
 
 ```php
 # Mapping named "accounts_storage" that holds the account details for
@@ -110,12 +110,14 @@ func accounts_storage(address: felt) -> (account: Account):
 end
 ```
 
+We can also return structs from a Cairo function. You can find an example [in this code sample](./cairo-app/contracts/structs-mappings.cairo)
+
 ### Declaring variables
 
 Variables can be aliased, using the `let` keyword, or evaluated, using the `const`, `local` or `tempvar` keywords.
 
 - `const` used for constants, can not be re-assigned.
-- `local` used for local variables. Can not be re-assigned and require adding `allow_locals` to the function
+- `local` used for local variables. Can not be re-assigned and require adding `alloc_locals` to the function
 - `tempvar` used for temporary variables. They can be re-assigned.
 - `let` used to create alias by value or by reference to another variables. Can be re-assigned.
 
@@ -130,33 +132,35 @@ func storage_variable() -> (res : felt):
 end
 
 func variable_examples{}():
-  // required to use local variables
-  allow_locals
+  # required to use local variables
+  alloc_locals
 
-  // creating alias by value
+  # creating alias by value
   let a = 5
   let b = 3
 
-  // creating alias by reference. x value is 5
+  # creating alias by reference. x value is 5
   let x = a
 
-
-  // constant, can not be re assigned
+  # constant, can not be re assigned
   const ten = 10
 
-  // res is 15 here, 5 * 3
+  # res is 15 here, 5 * 3
   tempvar res = a * b
 
-  //local varible. c is 15
+  # local varible. c is 15
   local c = ten + a
 
-  // re-assign aliased variable
+  # re-assign aliased variable
   let b = 2
 
-  // re-assign tempvar. res is 10 here, 5 * 2
+  # re-assign tempvar. res is 10 here, 5 * 2
   tempvar res = a * b
 
+  return ()
+
 end
+
 ```
 
 Notice that in order to re-assign a variable, you have to indicate the variable type (`tempvar`, `let`).
