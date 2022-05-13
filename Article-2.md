@@ -294,7 +294,15 @@ end
 
 ```
 
-### Messaging between L1-L2 ??
+### Messaging between L1-L2
+
+One of the cool things your can do with Cairo is sending messages between StarkNet (L2) and Ethereum (L1).
+
+You'd need to deploy a contract in StarkNet and use the `send_message_to_l1` function which takes as parameteres the address of the contract that is going to receive the message in the L1 and the payload.
+
+You'll also need to deploy a contract in Ethereum that implements the interface [IStarknetCore](https://www.cairo-lang.org/docs/hello_starknet/index.html#starknet-alpha-on-mainnet) which has the methods `sendMessageToL2` and `consumeMessageFromL2`.
+
+You can find a [step-by-step tutorial about L1-L2 messaging in our docs](https://docs.chainstack.com/tutorials/starknet/nft-contract-with-nile-and-l1-l2-reputation-messaging#prerequisites).
 
 ### A basic contract with Nile
 
