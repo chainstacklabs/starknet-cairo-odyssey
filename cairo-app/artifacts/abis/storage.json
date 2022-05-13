@@ -1,0 +1,25 @@
+[
+    {
+        "inputs": [
+            {
+                "name": "n",
+                "type": "felt"
+            }
+        ],
+        "name": "update_number",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "check_number",
+        "outputs": [
+            {
+                "name": "res",
+                "type": "felt"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
+]
