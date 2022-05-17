@@ -314,7 +314,42 @@ That covers some of the basics so, let's check basic example of a contract that 
 
 ## Front end and dApps
 
-There is a starknet.js library for the frontend that injects a starknet object similar to `window.ethereum`. In addition, the or "get-starknet" `npm i get-starknet`
+When it comes to interact with StarkNet from a web 3 app, there are two main options:
+
+- starknet.js
+- @argent/get-starknet
+
+The first one is a standalone Javascript library while the second one is a light wrapper that makes it easier to interact with the wallet, although it uses the same API to interact with contracts.
+
+The `@argent/get-starknet` makes it super simple to connect a wallet and, y default, includes a pop-up that allows users to use both ArgentX or Braavos wallets. Here's a quick code snippet that shows how to connect your wallet:
+
+```js
+import { connect } from '@argent/get-starknet'
+
+let starknet = null
+
+const connectWallet = async () => {
+  starknet = await connect()
+  console.log('startknet >>', starknet)
+
+  if (!starknet) {
+    throw Error(
+      'User rejected wallet selection or silent connect found nothing'
+    )
+  }
+
+  await starknet.enable()
+
+  // Check if connection was successful
+  if (starknet.isConnected) {
+    console.log('starknet connected')
+  } else {
+    console.log('starknet wallet not connected')
+  }
+}
+```
+
+To interact with a contract
 
 ```js
 import {getStartknet} from "@argent/get-starknet"
