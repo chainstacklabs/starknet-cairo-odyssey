@@ -1,22 +1,20 @@
-This is part two of the StarkNet odyssey series in which I explore the StarkNet L2 protocol. Make sure to [check part one of this series](https://chainstack.com/starknet-developer-introduction-part-1/) to get an overview of the protocol, understand what ZK-Proofs are and learn about all the different tools you need to start developing on StarkNet.
+This is part two of the StarkNet odyssey series in which I explore the StarkNet L2 protocol. Make sure to [check part one of this series](https://chainstack.com/starknet-developer-introduction-part-1/) to get an overview of the protocol, understand what ZK-Proofs are, and learn about all the different tools you need to start developing on StarkNet.
 
-In this article we'll review the funcdaments of Cairo, the language to write smart contracts in StarkNet, and we'll see how to interact with our contracts from a frontend app using the ArgentX Javascript library.
+In this article we'll review the fundaments of Cairo, the language used to write smart contracts in StarkNet, and we'll see how to interact with our contracts from a frontend app using the ArgentX Javascript library.
 
-You can find all the code samples, contracts and web app shown in this article [in the following repository](https://github.com/uF4No/starknet-cairo-odyssey).
-
-## Smart contracts and programs with Cairo
-
-Cairo is... well, Cairo is hell. Although there is an [official Cairo 101 repository](https://github.com/starknet-edu/starknet-cairo-101) with code samples and contracts, the learning curve is super steep and understanding how things work can be very overwhelming.
-
-![](./img/cairo-hell.png)
-
-So let's try to break down the most common paterns and things that you need to know before you start to write a single line of code
+You can find all the code samples, contracts, and web app shown in this article [in the following GitHub repository](https://github.com/uF4No/starknet-cairo-odyssey).
 
 ## Cairo fundamentals
 
+Cairo is... well, Cairo is hell. Although there is an [official Cairo 101 repository](https://github.com/starknet-edu/starknet-cairo-101) with code samples and contracts, the learning curve is super steep and understanding how things work can be very overwhelming.
+
+![Cairo for StarkNet developers](./img/cairo-hell.png)
+
+So let's try to break down the most common paterns and things that you need to know before you start to write a single line of code.
+
 ### WTF is felt?
 
-`felt` stands for Field Element is the only data type in Cairo. In simple terms, it's an unsigned integer with up to 76 decimals but it can also be used store addresses.
+`felt` stands for Field Element is **the only data type in Cairo**. In simple terms, it's an unsigned integer with up to 76 decimals but it can also be used store addresses.
 
 ### Strings
 
@@ -31,7 +29,7 @@ let hello_string = 'hello'
 
 Working with arrays in Cairo is done using a pointer that points to the start of the array, which is declared as a `felt*` using the `alloc` method.
 
-Adding new elements to the array can be done using `assert` ([more on that later](#assert)) and the pointer. See an example below:
+Adding new elements to the array can be done using `assert` ([more on that later](#assertions)) and the pointer. See an example below:
 
 ```php
 %lang starknet
@@ -43,7 +41,7 @@ from starkware.cairo.common.alloc import alloc
 # view function that returns a felt and
 # has range_check_ptr as an implicid argument
 @view
-func array_demo{range_check_ptr}(index : felt) -> (value : felt):
+func array_demo(index : felt) -> (value : felt):
     # Creates a pointer to the start of an array.
     let (my_array : felt*) = alloc()
 
@@ -62,7 +60,7 @@ end
 
 If we try to read a value from an array at an invalid index, the program will fail with the following error: **Unknown value for memory cell at address**.
 
-You can use arrays as function parameters or in returns, but when declaring it, you should indicate two parameters, the array's length, and the array itself. The naming convention is also important and should be `my-_array_name` and `my_array_name_len`. For example:
+You can use arrays as function parameters or in returns, but when declaring it, you should indicate two parameters, the array's length, and the array itself. The naming convention is also important and should be `my_array_name` and `my_array_name_len`. For example:
 
 ```php
 %lang starknet
@@ -70,10 +68,9 @@ You can use arrays as function parameters or in returns, but when declaring it, 
 
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 
-# Function that receives an array as parameter
+# Function that receives an array as parameter, so it actually receives the array length and # the array itself
 @external
-func array_play{syscall_ptr : felt*,range_check_ptr
-    }(array_param_len : felt, array_param : felt*) -> (res: felt):
+func array_play(array_param_len : felt, array_param : felt*) -> (res: felt):
     # read first element of the array
     let first = array_param[0]
     # read last element of the array
@@ -87,7 +84,7 @@ end
 
 If you don't follow the proper naming convention, you'll get the following error from the compiler: **Array argument "array_param" must be preceded by a length argument named "array_param_len" of type felt.**
 
-You can find an example to work with arrays in Cairo in [this cairo contract](./cairo-app/contracts/arrays.cairo).
+You can find an example to work with arrays in Cairo in [this cairo contract](./cairo-examples/contracts/arrays.cairo).
 
 ### Structs and Mappings
 
@@ -112,7 +109,7 @@ func accounts_storage(address: felt) -> (account: Account):
 end
 ```
 
-We can also return structs from a Cairo function. You can find an example [in this code sample](./cairo-app/contracts/structs-mappings.cairo)
+We can also return structs from a Cairo function. You can find an example [in this code sample](./cairo-examples/contracts/structs-mappings.cairo)
 
 ### Declaring variables
 
@@ -123,7 +120,7 @@ Variables can be aliased, using the `let` keyword, or evaluated, using the `cons
 - `tempvar` used for temporary variables. They can be re-assigned.
 - `let` used to create alias by value or by reference to another variables. Can be re-assigned.
 
-Here are some examples of how to use them:
+Here are some examples of how to use each one of them:
 
 ```php
 %lang starknet
@@ -202,6 +199,16 @@ end
 
 ```
 
+### Why is `{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}` in every method?
+
+If you have read any Cairo contract you've probably found these line of code all over the place:`{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}`.
+
+Those are implicid function arguments and they are used to access the state variables behind the scenes. In addition, `range_check_ptr` can be used to compare integers. Just remember to include them in your function declarations when you're reading or writing state varibles.
+
+If you forget to include them, the compiler will fail with the following error: **Unknown identifier 'syscall_ptr' ... Unknown identifier 'syscall_ptr'** 😉
+
+![](./img/nile-compile-implicit-args.png)
+
 ### Assertions
 
 The `assert` statement is very useful but it can be used for two completely different things:
@@ -231,7 +238,7 @@ end
 
 ```
 
-For other assertions, you can import the `starkware.cairo.common.math` library which comes with a lot of assertions like `assert_not_zero`, `assert_in_range`, `assert_not_equal`, `assert_le` and `assert_lt`. For example:
+For other assertions, you can import different methods from the `starkware.cairo.common.math` library like `assert_not_zero`, `assert_in_range`, `assert_not_equal`, `assert_le` and `assert_lt`. For example:
 
 ```php
 %lang starknet
@@ -284,11 +291,7 @@ func openAccount{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_p
 end
 ```
 
-If you just got another WTF moment when reading `{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}`, let me explain. Those are implicid function arguments and they are used to access the state variables behind the scenes. In addition, `range_check_ptr` can be used to compare integers. Just remember to include them in your function declarations if you want to avoid the following error: **Unknown identifier 'syscall_ptr' ... Unknown identifier 'syscall_ptr'** 😉
-
-![](./img/nile-compile-implicit-args.png)
-
-Returned values must be indicated in the function declaration, and wraped in parentheisis in the body, even if the function does not return anything 😉
+Returned values must be indicated in the function declaration, and wraped in parenthesis in the body, even if the function does not return anything 😉
 
 ### Contract structure
 
@@ -309,17 +312,19 @@ You'll also need to deploy a contract in Ethereum that implements the interface 
 
 You can find a [step-by-step tutorial about L1-L2 messaging in our docs](https://docs.chainstack.com/tutorials/starknet/nft-contract-with-nile-and-l1-l2-reputation-messaging#prerequisites).
 
-### A basic contract with Nile
+## Interacting with contracts
 
-That covers some of the basics so, let's check basic example of a contract that allows users to open an account and deposit funds.
+You can interact with contracts directly from [Voyager](https://voyager.online/), the official explorer.
 
-## Javascript libraries
-
-When it comes to interact with StarkNet from a web 3 app, there are two main options: starknet.js and @argent/get-starknet
+When it comes to interact with StarkNet contracts from a web application, there are two main options: starknet.js and @argent/get-starknet.
 
 The first one is a standalone Javascript library that you can use in both front and back end applications. You can find the [API documentation here](https://www.starknetjs.com/docs/API/).
 
 The second one is a light wrapper that makes it easier to interact with the wallet, although it uses the `starknet.js` library as a peer dependency so the API to interact with contracts it's the same.
+
+### Web app example
+
+I've created a Vue.js web app to showcase how to interact with a contract deployed to StarkNet. You can [find the code in the following repository](https://github.com/uF4No/starknet-cairo-odyssey/).
 
 The `@argent/get-starknet` makes it super simple to connect a wallet and, by default, includes a pop-up that allows users to use both ArgentX or Braavos wallets.
 
@@ -402,4 +407,4 @@ If you prefer to use Python in your StarkNet projects, [StarkNet.py](https://git
 
 I hope this help you kick-start your projects in StarkNet and solve any doubts you might have about how to start developing apps in it.
 
-L2 solutions are becoming more and more popular and StarkNet is one of the most active ones, with Hackathons happening almost every month. The team has recently launched [StarkGate](https://starkgate.starknet.io/), a bridge to move ETH to StarkNet and the adoption has been great so more applications will be available soon.
+L2 solutions are becoming more and more popular and StarkNet is one of the most active ones, with hackathons taking place almost every month. The team has recently launched [StarkGate](https://starkgate.starknet.io/), a bridge to move ETH to StarkNet and the adoption has been great so more applications will be available soon.
