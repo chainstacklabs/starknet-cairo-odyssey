@@ -200,9 +200,9 @@ end
 
 ```
 
-### Assert statement
+### Assertions
 
-Assert is very useful statement that can be used for two completely different things:
+The `assert` statement is very useful but it can be used for two completely different things:
 
 - to compare if the value of two variables is the same
 - to set the value in a variable that has not been set before
@@ -212,7 +212,6 @@ See the example below:
 ```php
 %lang starknet
 
-# Function that
 @external
 func demo_assert(guess : felt) :
     const a = 7
@@ -228,6 +227,32 @@ func demo_assert(guess : felt) :
     return ()
 end
 
+```
+
+For other assertions, you can import the `starkware.cairo.common.math` library which comes with a lot of assertions like `assert_not_zero`, `assert_in_range`, `assert_not_equal`, `assert_le` and `assert_lt`. For example:
+
+```php
+%lang starknet
+
+from starkware.cairo.common.math import (
+  assert_not_equal,
+        assert_in_range
+        assert_not_zero,
+        assert_lt,
+        assert_le,
+)
+
+@external
+func assertions_demo(a: felt, b: felt):
+
+    assert_not_zero(a)
+    assert_not_equal(b, a)
+    assert_le(1, 100)
+    assert_lt(b, 1)
+    assert_in_range(b, 1, 60)
+
+    return ()
+end
 ```
 
 ### Contract functions
@@ -312,16 +337,13 @@ You can find a [step-by-step tutorial about L1-L2 messaging in our docs](https:/
 
 That covers some of the basics so, let's check basic example of a contract that allows users to open an account and deposit funds.
 
-## Front end and dApps
+## Javascript libraries
 
-When it comes to interact with StarkNet from a web 3 app, there are two main options:
+When it comes to interact with StarkNet from a web 3 app, there are two main options: starknet.js and @argent/get-starknet
 
-- starknet.js
-- @argent/get-starknet
+The first one is a standalone Javascript library that you can use in both front and back end applications. You can find the [API documentation here](https://www.starknetjs.com/docs/API/). The second one is a light wrapper that makes it easier to interact with the wallet, although it uses the same API to interact with contracts.
 
-The first one is a standalone Javascript library while the second one is a light wrapper that makes it easier to interact with the wallet, although it uses the same API to interact with contracts.
-
-The `@argent/get-starknet` makes it super simple to connect a wallet and, y default, includes a pop-up that allows users to use both ArgentX or Braavos wallets. Here's a quick code snippet that shows how to connect your wallet:
+The `@argent/get-starknet` makes it super simple to connect a wallet and, by default, includes a pop-up that allows users to use both ArgentX or Braavos wallets. Here's a quick code snippet that shows how to connect your wallet:
 
 ```js
 import { connect } from '@argent/get-starknet'
@@ -349,21 +371,47 @@ const connectWallet = async () => {
 }
 ```
 
-To interact with a contract
+Once your app is connected to the user's wallet, you can interact with contracts using the `starknet.account.callContract` method for view functions, or `starknet.account.execute` for external methods. Both require an object with the following properties:
+
+- `contractAddress`
+- `entrypoint` which is the method name we want to call.
+- `calldata` an array with all the parameteres we want to send. (optional)
+
+Here is an example to use both:
 
 ```js
-import {getStartknet} from "@argent/get-starknet"
+const CONTRACT_ADDRESS =
+  '0x07955c619cb22d08ece120ef4f5faa531318ac9934018ef28fdae9284b831b4d'
 
-const starknet = getStarknet({showModal: true})
-
-const [userAccountAddress] = await starknet.enable({showModal: true})
-
-if(starknet.isConnected){
-  //if connected, we can interact with contracts and sign transactions
-  starknet.signer.invokeFunction({...})
-}else{
-  // we can still use the provider to query the blockchain
-  starknet.provider.callContract(...)
+// Reads from the chain using callContract
+const getUserNumber = async () => {
+  try {
+    const res = await starknet.provider.callContract({
+      contractAddress: CONTRACT_ADDRESS,
+      entrypoint: 'get_number',
+    })
+    console.log('res', res)
+    savedNumber.value = Number(`${res.result[0]}`)
+  } catch (error) {
+    console.error(error)
+  }
 }
 
+// Writes on-chain using execute
+const saveNumber = async () => {
+  try {
+    const trxDetails = await starknet.account.execute({
+      contractAddress: CONTRACT_ADDRESS,
+      entrypoint: 'save_number',
+      calldata: [userNum.value],
+    })
+    console.log('trxDetails', trxDetails)
+  } catch (error) {
+    console.error(error)
+  }
+}
 ```
+
+## StarkNet Python library
+
+If you prefer to use Python in your StarkNet projects, [StarkNet.py](https://github.com/software-mansion/starknet.py) is what you need. It offers both synchronous and asynchronous methods to interact with contracts and query the blockchain.
