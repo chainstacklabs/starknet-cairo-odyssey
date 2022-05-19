@@ -36,4 +36,14 @@ async def test_saveNumber(contract_factory):
     print(number)
     assert number.result.res == 99
 
+     # save number for user
+    await contract.save_number(33).invoke()
+
+    # retrieve number
+    number = await contract.get_number().call()
+    print(number)
+    assert number.result.res == 33
+
+
+
     

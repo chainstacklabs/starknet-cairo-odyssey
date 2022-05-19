@@ -34,11 +34,10 @@ const saveNumber = async () => {
       {
         contractAddress: CONTRACT_ADDRESS,
         entrypoint: 'save_number',
-        calldata: [CONTRACT_ADDRESS, userNum.value],
-      },
-      undefined,
-      { maxFee: 0 }
-      // [ContractInterface, {}]
+        calldata: [userNum.value],
+      }
+      // undefined,
+      // { maxFee: 0 }
     )
     console.log('trxDetails', trxDetails)
   } catch (error) {
@@ -52,12 +51,12 @@ const getUserNumber = async () => {
       {
         contractAddress: CONTRACT_ADDRESS,
         entrypoint: 'get_number',
-      },
-      undefined,
-      {}
+      }
+      // undefined,
+      // {}
     )
     console.log('res', res)
-    savedNumber.value = res
+    savedNumber.value = Number(`${res.result[0]}`)
   } catch (error) {
     console.error(error)
   }
