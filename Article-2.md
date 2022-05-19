@@ -10,7 +10,7 @@ Cairo is... well, Cairo is hell. Although there is an [official Cairo 101 reposi
 
 ![Cairo for StarkNet developers](./img/cairo-hell.png)
 
-So let's try to break down the most common paterns and things that you need to know before you start to write a single line of code.
+So let's try to break down the most common paterns and **things that you need to know before you start to write a single line of code.**
 
 ### WTF is felt?
 
@@ -27,7 +27,7 @@ let hello_string = 'hello'
 
 ### Arrays
 
-Working with arrays in Cairo is done using a pointer that points to the start of the array, which is declared as a `felt*` using the `alloc` method.
+To working with arrays in Cairo you need a pointer that points to the start of the array, which is declared as a `felt*` using the `alloc` method.
 
 Adding new elements to the array can be done using `assert` ([more on that later](#assertions)) and the pointer. See an example below:
 
