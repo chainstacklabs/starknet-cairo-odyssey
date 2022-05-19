@@ -1,12 +1,14 @@
-This is part two of the StarkNet odyssey series in which I explore the StarkNet L2 protocol. Make sure to [check part one of this series]() to get an overview of the protocol, understand what ZK-Proofs are and learn about all the different tools you need to start developing on StarkNet.
+This is part two of the StarkNet odyssey series in which I explore the StarkNet L2 protocol. Make sure to [check part one of this series](https://chainstack.com/starknet-developer-introduction-part-1/) to get an overview of the protocol, understand what ZK-Proofs are and learn about all the different tools you need to start developing on StarkNet.
 
-After we have installed all the dependencies, Cairo and Nile, we can bootstrap a new project with `nile init`. This will create a contract example and a test file.
+In this article we'll review the funcdaments of Cairo, the language to write smart contracts in StarkNet, and we'll see how to interact with our contracts from a frontend app using the ArgentX Javascript library.
+
+You can find all the code samples, contracts and web app shown in this article [in the following repository](https://github.com/uF4No/starknet-cairo-odyssey).
 
 ## Smart contracts and programs with Cairo
 
-Cairo is... well, Cairo is hell. The learning curve is super steep but every step is super rewarding.
+Cairo is... well, Cairo is hell. Although there is an [official Cairo 101 repository](https://github.com/starknet-edu/starknet-cairo-101) with code samples and contracts, the learning curve is super steep and understanding how things work can be very overwhelming.
 
-CAIRO IS HELL IMAGE
+![](./img/cairo-hell.png)
 
 So let's try to break down the most common paterns and things that you need to know before you start to write a single line of code
 
@@ -282,46 +284,20 @@ func openAccount{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_p
 end
 ```
 
-If you just got another WTF moment when reading `{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}`, let me explain. Those are implicid function arguments. they are used to access the state variables behind the scenes. In addition, `range_check_ptr` can be used to compare integers. Just remember to include them in your function declarations if you want to avoid the following error: **Unknown identifier 'syscall_ptr' ... Unknown identifier 'syscall_ptr'** 😉
+If you just got another WTF moment when reading `{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}`, let me explain. Those are implicid function arguments and they are used to access the state variables behind the scenes. In addition, `range_check_ptr` can be used to compare integers. Just remember to include them in your function declarations if you want to avoid the following error: **Unknown identifier 'syscall_ptr' ... Unknown identifier 'syscall_ptr'** 😉
 
 ![](./img/nile-compile-implicit-args.png)
 
-Returned values must be indicated in the function declaration, and wraped in parentheisis in the body 😉
+Returned values must be indicated in the function declaration, and wraped in parentheisis in the body, even if the function does not return anything 😉
 
 ### Contract structure
 
-Contracts in Cairo have a similar structure to contracts writen in Solidity.
+Contracts in Cairo have a similar structure to contracts writen in Solidity. It'll contain the following:
 
-```php
-# Declare this file as a StarkNet contract.
-%lang starknet
-
-# Imports
-from starkware.cairo.common.cairo_builtins import HashBuiltin
-
-# State variables, structs, etc
-
-# Account struct
-struct Account:
-    member isOpen: felt
-    member balance: felt
-end
-
-# Keeps a counter of the number of accounts
-@storage_var
-func number_of_accounts() -> (res: felt):
-end
-
-# Contract methods
-
-# view function that returns the number of accounts from the storage variable
-@view
-func accountsOpen{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (res: felt):
-    let (res) = number_of_accounts.read()
-    return (res)
-end
-
-```
+1. language declaration `%lang starknet`
+2. imports
+3. structs and state variables
+4. contract methods
 
 ### Messaging between L1-L2
 
@@ -341,9 +317,15 @@ That covers some of the basics so, let's check basic example of a contract that 
 
 When it comes to interact with StarkNet from a web 3 app, there are two main options: starknet.js and @argent/get-starknet
 
-The first one is a standalone Javascript library that you can use in both front and back end applications. You can find the [API documentation here](https://www.starknetjs.com/docs/API/). The second one is a light wrapper that makes it easier to interact with the wallet, although it uses the same API to interact with contracts.
+The first one is a standalone Javascript library that you can use in both front and back end applications. You can find the [API documentation here](https://www.starknetjs.com/docs/API/).
 
-The `@argent/get-starknet` makes it super simple to connect a wallet and, by default, includes a pop-up that allows users to use both ArgentX or Braavos wallets. Here's a quick code snippet that shows how to connect your wallet:
+The second one is a light wrapper that makes it easier to interact with the wallet, although it uses the `starknet.js` library as a peer dependency so the API to interact with contracts it's the same.
+
+The `@argent/get-starknet` makes it super simple to connect a wallet and, by default, includes a pop-up that allows users to use both ArgentX or Braavos wallets.
+
+![](./img/wallet.gif)
+
+Here's a quick code snippet that shows how to connect to the user's wallet:
 
 ```js
 import { connect } from '@argent/get-starknet'
@@ -371,7 +353,7 @@ const connectWallet = async () => {
 }
 ```
 
-Once your app is connected to the user's wallet, you can interact with contracts using the `starknet.account.callContract` method for view functions, or `starknet.account.execute` for external methods. Both require an object with the following properties:
+Once your app is connected to the user's wallet, you can use it to interact with contracts using the `starknet.account.callContract` function for view methods, or `starknet.account.execute` for external methods. Both require an object with the following properties:
 
 - `contractAddress`
 - `entrypoint` which is the method name we want to call.
@@ -415,3 +397,9 @@ const saveNumber = async () => {
 ## StarkNet Python library
 
 If you prefer to use Python in your StarkNet projects, [StarkNet.py](https://github.com/software-mansion/starknet.py) is what you need. It offers both synchronous and asynchronous methods to interact with contracts and query the blockchain.
+
+### Conclusion
+
+I hope this help you kick-start your projects in StarkNet and solve any doubts you might have about how to start developing apps in it.
+
+L2 solutions are becoming more and more popular and StarkNet is one of the most active ones, with Hackathons happening almost every month. The team has recently launched [StarkGate](https://starkgate.starknet.io/), a bridge to move ETH to StarkNet and the adoption has been great so more applications will be available soon.

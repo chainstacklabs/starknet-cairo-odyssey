@@ -6,10 +6,16 @@ The two articles have been published in the [Chainstack blog](https://chainstack
 
 ## Cairo code samples
 
-You can find differe contracts with examples in the `code-app` folder. Make sure to follow instructions to setup your development environment, explained in the first article.
+You can find differe contracts with examples in the `cairo-examples` folder. Make sure to follow instructions to setup your development environment, explained in [the first article](https://chainstack.com/starknet-developer-introduction-part-1/).
 
-The `code-app` is a Nile project so it's recommended to install it as well.
+The `cairo-examples` is a Nile project so it's recommended to install it as well.
 
 ### Run tests
 
-The test files in the `caido-app/tests/` folder can be run using `pytest`.
+The test files in the `cairo-examples//tests/` folder can be run using `pytest`, for examples `pytest ./tests/test_secretNumber.py`
+
+## Web app examples
+
+The `webapp` folder contains a Vue.js application to showcase how to interact with a contract deployed in StarkNet. Check out the [Numbers](./webapp/src/components/Numbers.vue) component to see how to connect to a wallet call contract methods.
+
+The app uses `@argent/get-starknet` library.
