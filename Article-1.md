@@ -117,7 +117,7 @@ Here are the main commands you can run with Nile:
 - To compile the contract run `nile compile`. Compiled files will be in the `/artifacts` folder.
 - To run a local node, run `nile node`.
 - To run tests, use `pytest -s path/to/testfile`
-- To deploy a contract run `nile deploy myContract --alias contract ` where the first "myContract" is the contract file name and the second, the alias you want to save it with.
+- To deploy a contract run `nile deploy myContract --alias contract` where the first "myContract" is the contract file name and the second, the alias you want to save it with.
 
 ![](./img/nile-compile-deploy.png)
 
