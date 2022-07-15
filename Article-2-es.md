@@ -198,7 +198,7 @@ end
 
 ```
 
-### Por qué is `{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}` aparece en cada método?
+### Qué es `{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}` aparece en cada método?
 
 Si has leido algún contrato escrito en Cairo, probablemente habrás visto estas lineas multiples veces: `{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}`.
 
