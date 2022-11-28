@@ -2,7 +2,7 @@
 
 This repo contains first steps, tips and learnings to use StarkNet and create smart contracts using Cairo.
 
-The two articles have been published in the [Chainstack blog](https://chainstack.com/)
+The two articles have been published in the [Chainstack blog](https://chainstack.com/):
 
 - [A StarkNet odyssey: Overview and developer tools](https://chainstack.com/starknet-developer-introduction-part-1)
 - [A StarkNet odyssey: Escaping Cairo hell](https://chainstack.com/starknet-cairo-developer-introduction-part-2/)
