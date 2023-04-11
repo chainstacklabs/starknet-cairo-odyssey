@@ -15,7 +15,7 @@ The `cairo-examples` is a Nile project so it's recommended to install it as well
 
 ### Run tests
 
-The test files in the `cairo-examples//tests/` folder can be run using `pytest`, for examples `pytest ./tests/test_secretNumber.py`
+The test files in the `/cairo-examples/tests/` folder can be run using `pytest`, for examples `pytest ./tests/test_secretNumber.py`
 
 ## Web app example
 
